@@ -6,7 +6,7 @@ from sklearn.impute import SimpleImputer
 import sklearn.preprocessing as pre
 import sys
 print(sys.version)
-pip install --upgrade streamlit
+
 
 
 
