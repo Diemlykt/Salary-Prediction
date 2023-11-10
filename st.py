@@ -3,8 +3,8 @@ import pandas as pd
 from sklearn.impute import SimpleImputer
 import sklearn.preprocessing as pre
 
-DATA_URL ="D:\Desktop\IMP -Semester 3\Intelligent system\stack-overflow-developer-survey-2023\survey_results_public.csv"   
-data = pd.read_csv(DATA_URL)
+
+data = pd.read_csv("survey_results_public.csv")
 
 
 # Title and Sidebar Title
