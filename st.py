@@ -1,11 +1,10 @@
-import subprocess
-subprocess.run(["pip", "install", "scikit-learn"])
+sudo pip3 install scikit-learn
 import streamlit as st
 import pandas as pd
 from sklearn.impute import SimpleImputer
 import sklearn.preprocessing as pre
 import sys
-print(sys.version)
+
 
 
 
