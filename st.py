@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from sklearn.impute import SimpleImputer
 import sklearn.preprocessing as pre
-
-
-
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
 
 
 
@@ -69,10 +69,46 @@ def user_input_features():
     Country=st.sidebar.selectbox("Where do you live?",['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei Darussalam', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cambodia', 'Cameroon', 'Canada', 'Cape Verde', 'Central African Republic', 'Chile', 'China', 'Colombia', 'Congo, Republic of the...', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czech Republic', "Côte d'Ivoire", "Democratic People's Republic of Korea", 'Democratic Republic of the Congo', 'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Estonia', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras', 'Hong Kong (S.A.R.)', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran, Islamic Republic of...', 'Iraq', 'Ireland', 'Isle of Man', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kosovo', 'Kuwait', 'Kyrgyzstan', "Lao People's Democratic Republic", 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libyan Arab Jamahiriya', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar', 'Namibia', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'Nomadic', 'North Korea', 'Norway', 'Oman', 'Pakistan', 'Palau', 'Palestine', 'Panama', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Republic of Korea', 'Republic of Moldova', 'Romania', 'Russian Federation', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Saudi Arabia', 'Senegal', 'Serbia', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Somalia', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Swaziland', 'Sweden', 'Switzerland', 'Syrian Arab Republic', 'Taiwan', 'Tajikistan', 'Thailand', 'The former Yugoslav Republic of Macedonia', 'Timor-Leste', 'Togo', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom of Great Britain and Northern Ireland', 'United Republic of Tanzania', 'United States of America', 'Uruguay', 'Uzbekistan', 'Venezuela, Bolivarian Republic of...', 'Viet Nam', 'Yemen', 'Zambia', 'Zimbabwe'],key="country")
     Language= st.sidebar.multiselect("Which programming, scripting, and markup languages have you done extensive development work in over the past year",
                                        ['Ada', 'Apex', 'APL', 'Assembly', 'Bash/Shell (all shells)', 'C ', 'C#', 'C++', 'Clojure', 'Cobol', 'Crystal', 'Dart', 'Delphi', 'Elixir', 'Erlang', 'F#', 'Flow', 'Fortran', 'GDScript', 'Go', 'Groovy', 'Haskell', 'HTML/CSS', 'Java', 'JavaScript', 'Julia', 'Kotlin', 'Lisp', 'Lua', 'MATLAB', 'Nim', 'Objective-C', 'OCaml', 'Perl', 'PHP', 'PowerShell', 'Prolog', 'Python', 'R ', 'Raku', 'Ruby', 'Rust', 'SAS', 'Scala', 'Solidity', 'SQL', 'Swift', 'TypeScript', 'VBA', 'Visual Basic (.Net)', 'Zig'], key="language")
-    features={'Age': Age, 'Employment': Employment, 'RemoteWork': RemoteWork, 'EdLevel': EdLevel , 'LearnCode': LearnCode, 'YearsCodePro': YearsCodePro,'Industry': Industry, 'DevType': DevType, 'OrgSize': OrgSize, 'Country': Country, 'LanguageHaveWorkedWith': Language}
-    data_predict=pd.DataFrame(features)
+    LearnCode_str = ', '.join(LearnCode)
+    Language_str = ', '.join(Language)
+    Employment_str = ', '.join(Employment)
+    
+    features={'Age': Age, 'Employment': Employment_str, 'RemoteWork': RemoteWork, 'EdLevel': EdLevel , 'LearnCode': LearnCode_str, 'YearsCodePro': YearsCodePro,'Industry': Industry, 'DevType': DevType, 'OrgSize': OrgSize, 'Country': Country, 'LanguageHaveWorkedWith': Language_str}
+    index = [0]
+# Creating a DataFrame
+    data_predict = pd.DataFrame(features, index=index)
     return data_predict
-df=user_input_features()
+
+def pre_process(filtered_df):
+   learn_code=filtered_df['LearnCode'].str.get_dummies(sep=';')
+   languages = filtered_df['LanguageHaveWorkedWith'].str.get_dummies(sep=';')
+   Employ_situation = filtered_df['Employment'].str.get_dummies(sep=';')
+   Merge_data=filtered_df.merge(Employ_situation,left_index=True, right_index=True).merge(languages,left_index=True, right_index=True).merge(learn_code,left_index=True, right_index=True)
+   New_data=Merge_data.drop(columns=["Employment", "LearnCode", "LanguageHaveWorkedWith"])
+   table = New_data.copy()
+   wanted_cols = table.select_dtypes(include=['object']).columns
+   encoders = [pre.LabelEncoder()]*len(wanted_cols)
+   colname2encoder = dict(zip(wanted_cols, encoders))
+   # Transform columns
+   for colname in colname2encoder.keys():
+      table[colname] = colname2encoder[colname].fit_transform(table[colname])
+        
+   # Create an imputer object and specify the imputation strategy
+   imputer = SimpleImputer(strategy="most_frequent")
+
+   # Fit the imputer to the data
+   imputer.fit(table)
+
+   # Transform the data to impute missing values
+   table_transformed = imputer.transform(table)
+
+   # Convert the result back to a DataFrame
+   table_transformed = pd.DataFrame(table_transformed, columns=table.columns)
+   return table_transformed
+    
+
+
+
 # Example usage
 
 # Display content based on user selection
@@ -83,3 +119,32 @@ if app_mode == "Salary Analysis":
 elif app_mode == "Predict Salary":
     st.markdown("You've selected Predict Salary.")
     # Add code for salary prediction here
+    df=user_input_features()
+    st.subheader("User input parameters")
+    st.write(df)
+    select=['Age', 'Employment', 'RemoteWork', 'EdLevel', 'LearnCode', 'YearsCodePro','Industry', 'DevType', 'OrgSize','ConvertedCompYearly', 'Country', 'LanguageHaveWorkedWith']
+    data_df =data[select]
+    df_no_missing = data_df.dropna(subset='ConvertedCompYearly')
+    y = np.log(df_no_missing['ConvertedCompYearly']).copy()
+    filtered_df = df_no_missing.drop(columns=['ConvertedCompYearly'])
+    X = pre_process(filtered_df)
+    
+    X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42)
+    rf_model = RandomForestRegressor(n_estimators=100, random_state=42)  # You can adjust the hyperparameters
+    rf_model.fit(X_train, y_train)
+    X_user=pre_process(df)
+    missing_columns = set(X.columns) - set(X_user.columns)
+    for col in missing_columns:
+       X_user[col] = 0
+    X_user = X_user.reindex(columns=X.columns, fill_value=0)
+    y_pred = rf_model.predict(X_user)
+    y_pred_original_scale = np.exp(y_pred)
+    formatted_salary = "${:,.2f}".format(y_pred_original_scale[0])
+
+if st.button("Predict salary", key="predict"):
+    st.markdown("Your salary prediction is:")
+    st.write(formatted_salary)
+
+
+
