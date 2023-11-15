@@ -18,8 +18,24 @@ st.sidebar.title("2023 Developer Salary Web App")
 
 # Radio button for user selection
 app_mode = st.sidebar.radio("Select App Mode", ["Salary Analysis", "Predict Salary"])
+class SessionState:
+    def __init__(self):
+        self.age = None
+        self.employment = None
+        self.remote_work = None
+        self.ed_level = None
+        self.learn_code = None
+        self.years_code_pro = None
+        self.industry = None
+        self.dev_type = None
+        self.org_size = None
+        self.country = None
+        self.language = None
+        
 
-@st.cache(allow_output_mutation=True)
+# Create a session state object
+session_state = SessionState()
+
 def user_input_features():
     Age= st.sidebar.selectbox("What is your age?",['Under 18 years old','18-24 years old', '25-34 years old','35-44 years old', '45-54 years old','55-64 years old',
        '65 years or older', 'Prefer not to say'],key="age")
@@ -78,8 +94,8 @@ def user_input_features():
     index = [0]
 # Creating a DataFrame
     data_predict = pd.DataFrame(features, index=index)
-    return data_predict
-@st.cache(allow_output_mutation=True)
+    return session_state.age, session_state.employment, session_state.remote_work, session_state.ed_level, session_state.learn_code, session_state.years_code_pro, session_state.industry, session_state.dev_type, session_state.org_size, session_state.country, session_state.language
+
 def pre_process(filtered_df):
     learn_code=filtered_df['LearnCode'].str.get_dummies(sep=';')
     languages = filtered_df['LanguageHaveWorkedWith'].str.get_dummies(sep=';')
