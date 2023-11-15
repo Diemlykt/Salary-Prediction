@@ -78,7 +78,7 @@ def user_input_features():
     index = [0]
 # Creating a DataFrame
     data_predict = pd.DataFrame(features, index=index)
-    return session_state.age, session_state.employment, session_state.remote_work, session_state.ed_level, session_state.learn_code, session_state.years_code_pro, session_state.industry, session_state.dev_type, session_state.org_size, session_state.country, session_state.language
+    return data_predict
 @st.cache(suppress_st_warning=True) 
 def pre_process(filtered_df):
     learn_code=filtered_df['LearnCode'].str.get_dummies(sep=';')
