@@ -19,7 +19,7 @@ st.sidebar.title("2023 Developer Salary Web App")
 # Radio button for user selection
 app_mode = st.sidebar.radio("Select App Mode", ["Salary Analysis", "Predict Salary"])
 
-
+@st.cache(allow_output_mutation=True)
 def user_input_features():
     Age= st.sidebar.selectbox("What is your age?",['Under 18 years old','18-24 years old', '25-34 years old','35-44 years old', '45-54 years old','55-64 years old',
        '65 years or older', 'Prefer not to say'],key="age")
