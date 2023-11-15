@@ -19,7 +19,7 @@ st.sidebar.title("2023 Developer Salary Web App")
 # Radio button for user selection
 app_mode = st.sidebar.radio("Select App Mode", ["Salary Analysis", "Predict Salary"])
 
-@st.cache(suppress_st_warning=True) 
+@st.cache_data(suppress_st_warning=True) 
 def user_input_features():
     Age= st.sidebar.selectbox("What is your age?",['Under 18 years old','18-24 years old', '25-34 years old','35-44 years old', '45-54 years old','55-64 years old',
        '65 years or older', 'Prefer not to say'],key="age")
@@ -79,7 +79,7 @@ def user_input_features():
 # Creating a DataFrame
     data_predict = pd.DataFrame(features, index=index)
     return data_predict
-@st.cache(suppress_st_warning=True) 
+@st.cache_data(suppress_st_warning=True) 
 def pre_process(filtered_df):
     learn_code=filtered_df['LearnCode'].str.get_dummies(sep=';')
     languages = filtered_df['LanguageHaveWorkedWith'].str.get_dummies(sep=';')
