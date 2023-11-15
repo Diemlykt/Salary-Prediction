@@ -35,7 +35,7 @@ class SessionState:
 
 # Create a session state object
 session_state = SessionState()
-
+@st.cache(allow_output_mutation=True)
 def user_input_features():
     Age= st.sidebar.selectbox("What is your age?",['Under 18 years old','18-24 years old', '25-34 years old','35-44 years old', '45-54 years old','55-64 years old',
        '65 years or older', 'Prefer not to say'],key="age")
@@ -95,7 +95,7 @@ def user_input_features():
 # Creating a DataFrame
     data_predict = pd.DataFrame(features, index=index)
     return session_state.age, session_state.employment, session_state.remote_work, session_state.ed_level, session_state.learn_code, session_state.years_code_pro, session_state.industry, session_state.dev_type, session_state.org_size, session_state.country, session_state.language
-
+@st.cache(allow_output_mutation=True)
 def pre_process(filtered_df):
     learn_code=filtered_df['LearnCode'].str.get_dummies(sep=';')
     languages = filtered_df['LanguageHaveWorkedWith'].str.get_dummies(sep=';')
