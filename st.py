@@ -37,8 +37,7 @@ def clean_experience(x):
 
 @st.cache_data
 def load_data():
-    DATA_URL = "survey_results_public.csv"
-    df = pd.read_csv(DATA_URL)
+    df = pd.read_csv("survey_results_public.csv")
     select = ['Age', 'EdLevel', 'YearsCodePro', 'DevType', 'Country', 'ConvertedCompYearly']
     sel_df = df[select]
     sel_df = sel_df.rename({"ConvertedCompYearly": "Salary"}, axis=1)
