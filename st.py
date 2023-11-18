@@ -6,6 +6,180 @@ import sklearn.preprocessing as pre
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestRegressor
 import joblib
+import matplotlib.pyplot as plt
+import altair as alt
+
+	
+def shorten_categories(categories, cutoff):
+    categorical_map = {}
+    for i in range(len(categories)):
+        if categories.values[i] >= cutoff:
+            categorical_map[categories.index[i]] = categories.index[i]
+        else:
+            categorical_map[categories.index[i]] = 'Others'
+    return categorical_map
+
+def clean_experience(x):
+    if x ==  'More than 50 years':
+        return 50
+    if x == 'Less than 1 year':
+        return 0.5
+    return float(x)
+
+##def clean_education(x):
+    if 'Bachelor’s degree' in x:
+        return 'Bachelor’s degree'
+    if 'Master’s degree' in x:
+        return 'Master’s degree'
+    if 'Professional degree' in x or 'Other doctoral' in x:
+        return 'Post grad'
+    return 'Less than a Bachelors'##
+
+@st.cache_data
+def load_data():
+    DATA_URL = "D:\Desktop\IMP -Semester 3\Intelligent system\stack-overflow-developer-survey-2023\survey_results_public.csv"
+    df = pd.read_csv(DATA_URL)
+    select = ['Age', 'EdLevel', 'YearsCodePro', 'DevType', 'Country', 'ConvertedCompYearly']
+    sel_df = df[select]
+    sel_df = sel_df.rename({"ConvertedCompYearly": "Salary"}, axis=1)
+    
+    ctry_df = sel_df.copy()
+    country_map = shorten_categories(ctry_df.Country.value_counts(), 400)
+    ctry_df['Country'] = ctry_df['Country'].map(country_map)
+    #remove "Others"
+    
+    
+    job_df = ctry_df.copy()
+    job_map = shorten_categories(job_df.DevType.value_counts(), 300)
+    job_df['DevType'] = job_df['DevType'].map(job_map)
+    #remove "Others"
+    job_df = job_df[job_df['DevType'] != 'Others']
+    
+    age_df = job_df.copy()
+    age_map = shorten_categories(age_df.Age.value_counts(), 400)
+    age_df['Age'] = age_df['Age'].map(age_map)
+    #remove "Others"
+    age_df = age_df[age_df['Age'] != 'Others']
+    
+    exp_df = age_df.copy()
+    exp_df['YearsCodePro'] = exp_df['YearsCodePro'].apply(clean_experience)
+    exp_map = shorten_categories(exp_df.YearsCodePro.value_counts(), 200)
+    exp_df['YearsCodePro'] = exp_df['YearsCodePro'].map(exp_map)
+    #remove "Others"
+    exp_df = exp_df[exp_df['YearsCodePro'] != 'Others']
+    
+    edu_df = exp_df.copy()
+ ##   edu_df['EdLevel'] = edu_df['EdLevel'].apply(clean_education)##
+    
+    box_df = edu_df.copy()
+    final_df = box_df.copy()
+    final_df = final_df[final_df["Salary"] <= 300000]
+    final_df = final_df[final_df["Salary"] >= 10000]
+    
+    return final_df
+
+
+def show_explore():
+    st.sidebar.subheader("SURVEY OVERVIEW")   
+    selected_chart = st.sidebar.radio("Distribution of correspondences based on: ", ["Country", "Age", "Education Level"])
+    st.write(f"#### Distribution of correspondences based on {selected_chart}")
+    # Display chart based on user selection
+    if selected_chart == "Country":
+        data = df["Country"].value_counts().head(10)
+        fig1, ax1 = plt.subplots(figsize=(12, 8))
+        wedges, texts, autotexts = ax1.pie(data, labels=data.index, autopct="%1.1f%%", shadow=False, startangle=90)
+        ax1.axis("equal")
+        for autotext in autotexts:
+            autotext.set_fontsize(16)  # Adjust the font size as needed
+        # Separate legend from the pie chart with a larger font size
+        legend = ax1.legend(wedges, data.index, title="Countries", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1), prop={'size': 16})
+        legend.set_title("Countries", prop={'size': 16})
+        
+        st.pyplot(fig1)
+
+    elif selected_chart == "Age":
+        data = df["Age"].value_counts().sort_index()
+        fig, ax1 = plt.subplots(figsize=(18, 8))
+        ax1.barh(data.index, data, color=plt.cm.Paired(range(len(data))))
+
+        # Customize axis labels and title
+        ax1.set_xlabel('Count', fontsize=18)
+        ax1.set_ylabel('Age Groups', fontsize=18)
+       
+
+        # Increase font size of tick labels
+        ax1.tick_params(axis='both', labelsize=14)
+
+        st.pyplot(fig)
+
+    elif selected_chart == "Education Level":
+
+        data = df["EdLevel"].value_counts()
+        fig1, ax1 = plt.subplots(figsize=(16, 12))
+        wedges, texts, autotexts = ax1.pie(data,  autopct="%1.1f%%", shadow=False, startangle=90)
+        ax1.axis("equal")
+        for autotext in autotexts:
+            autotext.set_fontsize(16)  # Adjust the font size as needed
+
+        # Separate legend from the pie chart with a larger font size
+        legend = ax1.legend(wedges, data.index, title="Education Levels", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1), prop={'size': 16})
+        legend.set_title("Education Levels", prop={'size': 20})
+        
+        st.pyplot(fig1)
+
+
+
+    # Assume df is your DataFrame containing the relevant data
+
+    # Sidebar
+    selected_category = st.sidebar.radio("Analyze mean salary based on: ", ["Experience", "Country", "Job", "Age", "Education Level"])
+
+    # Main content based on the selected category
+    st.write(f"#### Mean Salary Based On {selected_category}")
+
+    if selected_category == "Experience":
+        # Line chart: Experience vs Salary
+        data = df.groupby(["YearsCodePro"])["Salary"].mean().sort_values(ascending=True)
+        st.line_chart(data)
+
+    elif selected_category == "Country":
+        # Bar chart: Country vs Salary
+        data = df.groupby(["Country"])["Salary"].mean().sort_values(ascending=False).reset_index()
+        chart = alt.Chart(data).mark_bar().encode(
+            x=alt.X('Country:N', sort=alt.EncodingSortField(field='Salary', op='mean', order='descending')),
+            y='Salary:Q',
+        )
+        st.altair_chart(chart, use_container_width=True)
+
+    elif selected_category == "Job":
+        # Bar chart: Job vs Salary
+        data = df.groupby(["DevType"])["Salary"].mean().sort_values(ascending=True).reset_index()
+        chart = alt.Chart(data).mark_bar().encode(
+            x=alt.X('DevType:N', sort=alt.EncodingSortField(field='Salary', op='mean', order='descending')),
+            y='Salary:Q',
+        )
+        st.altair_chart(chart, use_container_width=True)
+
+    elif selected_category == "Age":
+        # Bar chart: Age vs Salary
+        filtered_df = df[df["Age"] != 'Prefer not to say']
+        data = filtered_df.groupby(["Age"])["Salary"].mean().sort_values(ascending=True).reset_index()
+        chart = alt.Chart(data).mark_bar().encode(
+            x=alt.X('Age:N', sort=alt.EncodingSortField(field='Salary', op='mean', order='descending')),
+            y='Salary:Q',
+        )
+        st.altair_chart(chart, use_container_width=True)
+
+    elif selected_category == "Education Level":
+        # Bar chart: EdLevel vs Salary
+        data = df.groupby(["EdLevel"])["Salary"].mean().sort_values(ascending=True).reset_index()
+        chart = alt.Chart(data).mark_bar().encode(
+            x=alt.X('EdLevel:N', sort=alt.EncodingSortField(field='Salary', op='mean', order='descending')),
+            y='Salary:Q',
+        )
+        st.altair_chart(chart, use_container_width=True)
+
+
 
 # Load the saved model and preprocessing parameters
 lr_model = joblib.load('lr_model.joblib')
@@ -15,13 +189,16 @@ features_columns = joblib.load('features_columns.joblib')
 # Streamlit app code
 st.title("2023 Developer Salary Web App")
 st.sidebar.title("2023 Developer Salary Web App")
+st.sidebar.markdown("This application is based on data from the Stack Overflow Developer Survey 2023.")
+st.write("Welcome! Please select the app mode in the sidebar to continue.")
 
 # Radio button for user selection
-app_mode = st.sidebar.radio("Select App Mode", ["Salary Analysis", "Predict Salary"])
+app_mode = st.sidebar.radio("Select App Mode", ["Salary Analysis", "Salary Prediction"])
+
 
 def user_input_features():
     Age= st.sidebar.selectbox("What is your age?",['Under 18 years old','18-24 years old', '25-34 years old','35-44 years old', '45-54 years old','55-64 years old',
-       '65 years or older', 'Prefer not to say'],key="age")
+       '65 years or older'],key="age")
     Employment= st.sidebar.multiselect("Which of the following best describes your current employment status? Select all that apply",
                                         ["Employed, full-time", "Employed, part-time", "Independent contractor, freelancer, or self-employed", 
                                          "Retired", "I prefer not to say"], key="employment")
@@ -78,7 +255,6 @@ def user_input_features():
 # Creating a DataFrame
     data_predict = pd.DataFrame(features, index=index)
     return data_predict
-
 def pre_process(filtered_df):
     learn_code=filtered_df['LearnCode'].str.get_dummies(sep=';')
     languages = filtered_df['LanguageHaveWorkedWith'].str.get_dummies(sep=';')
@@ -110,15 +286,17 @@ def pre_process(filtered_df):
 
 
 if app_mode == "Salary Analysis":
-    st.markdown("You've selected Salary Analysis.")
-    # Add code for salary analysis here
-   
-elif app_mode == "Predict Salary":
-    st.markdown("You've selected Predict Salary.")
+    st.subheader("You've selected Salary Analysis.")
+    st.sidebar.markdown("Please select the information you wish to know: ")
+    df = load_data()
+    show_explore()  
+elif app_mode == "Salary Prediction":
+    st.subheader("You've selected Salary Prediction.")
     # Add code for salary prediction here
     df = user_input_features()
-    st.subheader("User input parameters")
+    st.markdown("Please provide the required information in the sidebar and review your input details in the table below.")
     st.write(df)
+
 
     # Preprocess user input
     X_user = pre_process(df)
@@ -134,7 +312,7 @@ elif app_mode == "Predict Salary":
     y_pred_original_scale = np.exp(y_pred)
     formatted_salary = "${:,.2f}".format(y_pred_original_scale[0])
 
-if st.button("Predict salary", key="predict"):
-    st.markdown("Your salary prediction is:")
-    st.write(formatted_salary)
+    if st.button("Predict salary", key="predict"):
+        st.markdown("Your yearly salary prediction is:")
+        st.write(formatted_salary)
 
