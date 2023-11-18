@@ -37,7 +37,7 @@ def clean_experience(x):
 
 @st.cache_data
 def load_data():
-    DATA_URL = "D:\Desktop\IMP -Semester 3\Intelligent system\stack-overflow-developer-survey-2023\survey_results_public.csv"
+    DATA_URL = "survey_results_public.csv"
     df = pd.read_csv(DATA_URL)
     select = ['Age', 'EdLevel', 'YearsCodePro', 'DevType', 'Country', 'ConvertedCompYearly']
     sel_df = df[select]
