@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestRegressor
 import joblib
 import matplotlib.pyplot as plt
 import altair as alt
+from xgboost import XGBRegressor
 
 
 	
