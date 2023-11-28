@@ -2,5 +2,6 @@ scikit-learn
 matplotlib
 numpy
 pandas
+xgboost
 streamlit
 Werkzeug
