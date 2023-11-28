@@ -6,6 +6,7 @@ import sklearn.preprocessing as pre
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 import joblib
+from xgboost import XGBRegressor
 
 # Load the dataset
 
@@ -25,7 +26,12 @@ y = np.log(df_no_missing['ConvertedCompYearly']).copy()
 # Drop the target variable from the feature set
 filtered_df = df_no_missing.drop(columns=['ConvertedCompYearly'])
 
-# Preprocess the data
+# Function to fit and transform the data using encoders
+encoders = {}
+def fit_transform_column(column):
+    encoder = {val: idx for idx, val in enumerate(column.unique())}
+    encoders[column.name] = encoder
+    return column.map(encoder)
 def pre_process(filtered_df):
     learn_code=filtered_df['LearnCode'].str.get_dummies(sep=';')
     languages = filtered_df['LanguageHaveWorkedWith'].str.get_dummies(sep=';')
@@ -34,12 +40,14 @@ def pre_process(filtered_df):
     New_data=Merge_data.drop(columns=["Employment", "LearnCode", "LanguageHaveWorkedWith"])
     table = New_data.copy()
     wanted_cols = table.select_dtypes(include=['object']).columns
-    encoders = [pre.LabelEncoder()]*len(wanted_cols)
-    colname2encoder = dict(zip(wanted_cols, encoders))
-   # Transform columns
-    for colname in colname2encoder.keys():
-        table[colname] = colname2encoder[colname].fit_transform(table[colname])
+
+    for col in wanted_cols:
+        # Use the actual column name from wanted_cols
+        column_name = col
         
+        # Assuming you have the fit_transform_column function defined
+        table[column_name] = fit_transform_column(table[column_name])
+
    # Create an imputer object and specify the imputation strategy
     imputer = SimpleImputer(strategy="most_frequent")
 
@@ -52,17 +60,18 @@ def pre_process(filtered_df):
    # Convert the result back to a DataFrame
     table_transformed = pd.DataFrame(table_transformed, columns=table.columns)
     return table_transformed
+if __name__ == '__main__':
+    freeze_support()
+    # Split the data into training and testing sets
+    X = pre_process(filtered_df)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Split the data into training and testing sets
-X = pre_process(filtered_df)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-from sklearn.linear_model import LinearRegression
+    # Train the Linear Regression model
+    xgb_model = XGBRegressor(subsample=0.7, n_estimators=400, min_child_weight=5, max_depth=5, learning_rate=0.05, colsample_bytree=0.5)
+    xgb_model.fit(X_train, y_train)
 
-# Train the Linear Regression model
-lr_model = LinearRegression()
-lr_model.fit(X_train, y_train)
-
-# Save the trained model and preprocessing parameters
-joblib.dump(lr_model, 'lr_model.joblib')
-joblib.dump(X.columns, 'features_columns.joblib')
+    # Save the trained model and preprocessing parameters
+    joblib.dump(xgb_model, 'xgb_model.joblib')
+    joblib.dump(X.columns, 'features_columns.joblib')
+    joblib.dump(encoders, 'encoders.joblib')
