@@ -9,6 +9,7 @@ import joblib
 import matplotlib.pyplot as plt
 import altair as alt
 
+
 	
 def shorten_categories(categories, cutoff):
     categorical_map = {}
@@ -181,8 +182,9 @@ def show_explore():
 
 
 # Load the saved model and preprocessing parameters
-lr_model = joblib.load('lr_model.joblib')
+lr_model = joblib.load('xgb_model.joblib')
 features_columns = joblib.load('features_columns.joblib')
+loaded_encoders = joblib.load('encoders.joblib')
 
 
 # Streamlit app code
@@ -249,7 +251,7 @@ def user_input_features():
     Language_str = ', '.join(Language)
     Employment_str = ', '.join(Employment)
     
-    features={'Age': Age, 'Employment': Employment_str, 'RemoteWork': RemoteWork, 'EdLevel': EdLevel , 'LearnCode': LearnCode_str, 'YearsCodePro': YearsCodePro,'Industry': Industry, 'DevType': DevType, 'OrgSize': OrgSize, 'Country': Country, 'LanguageHaveWorkedWith': Language_str}
+    features={'Age': Age, 'RemoteWork': RemoteWork, 'EdLevel': EdLevel,  'YearsCodePro': YearsCodePro, 'Industry': Industry, 'DevType': DevType, 'OrgSize': OrgSize, 'Country': Country, 'Employment': Employment_str ,'LanguageHaveWorkedWith': Language_str, 'LearnCode': LearnCode_str}
     index = [0]
 # Creating a DataFrame
     data_predict = pd.DataFrame(features, index=index)
@@ -262,11 +264,10 @@ def pre_process(filtered_df):
     New_data=Merge_data.drop(columns=["Employment", "LearnCode", "LanguageHaveWorkedWith"])
     table = New_data.copy()
     wanted_cols = table.select_dtypes(include=['object']).columns
-    encoders = [pre.LabelEncoder()]*len(wanted_cols)
-    colname2encoder = dict(zip(wanted_cols, encoders))
-   # Transform columns
-    for colname in colname2encoder.keys():
-        table[colname] = colname2encoder[colname].fit_transform(table[colname])
+    for col in wanted_cols:
+        if col in loaded_encoders:
+            table[col] = table[col].map(loaded_encoders[col])
+
         
    # Create an imputer object and specify the imputation strategy
     imputer = SimpleImputer(strategy="most_frequent")
