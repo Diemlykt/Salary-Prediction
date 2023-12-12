@@ -198,6 +198,8 @@ st.write("Welcome! Please select the app mode in the sidebar to continue.")
 app_mode = st.sidebar.radio("Select App Mode", ["Salary Analysis", "Salary Prediction"])
 
 
+
+
 def user_input_features():
     Age= st.sidebar.selectbox("What is your age?",['Under 18 years old','18-24 years old', '25-34 years old','35-44 years old', '45-54 years old','55-64 years old',
        '65 years or older'],key="age")
@@ -248,11 +250,17 @@ def user_input_features():
     Country=st.sidebar.selectbox("Where do you live?",['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei Darussalam', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cambodia', 'Cameroon', 'Canada', 'Cape Verde', 'Central African Republic', 'Chile', 'China', 'Colombia', 'Congo, Republic of the...', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czech Republic', "Côte d'Ivoire", "Democratic People's Republic of Korea", 'Democratic Republic of the Congo', 'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Estonia', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras', 'Hong Kong (S.A.R.)', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran, Islamic Republic of...', 'Iraq', 'Ireland', 'Isle of Man', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kosovo', 'Kuwait', 'Kyrgyzstan', "Lao People's Democratic Republic", 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libyan Arab Jamahiriya', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar', 'Namibia', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'Nomadic', 'North Korea', 'Norway', 'Oman', 'Pakistan', 'Palau', 'Palestine', 'Panama', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Republic of Korea', 'Republic of Moldova', 'Romania', 'Russian Federation', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Saudi Arabia', 'Senegal', 'Serbia', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Somalia', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Swaziland', 'Sweden', 'Switzerland', 'Syrian Arab Republic', 'Taiwan', 'Tajikistan', 'Thailand', 'The former Yugoslav Republic of Macedonia', 'Timor-Leste', 'Togo', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom of Great Britain and Northern Ireland', 'United Republic of Tanzania', 'United States of America', 'Uruguay', 'Uzbekistan', 'Venezuela, Bolivarian Republic of...', 'Viet Nam', 'Yemen', 'Zambia', 'Zimbabwe'],key="country")
     Language= st.sidebar.multiselect("Which programming, scripting, and markup languages have you done extensive development work in over the past year",
                                        ['Ada', 'Apex', 'APL', 'Assembly', 'Bash/Shell (all shells)', 'C ', 'C#', 'C++', 'Clojure', 'Cobol', 'Crystal', 'Dart', 'Delphi', 'Elixir', 'Erlang', 'F#', 'Flow', 'Fortran', 'GDScript', 'Go', 'Groovy', 'Haskell', 'HTML/CSS', 'Java', 'JavaScript', 'Julia', 'Kotlin', 'Lisp', 'Lua', 'MATLAB', 'Nim', 'Objective-C', 'OCaml', 'Perl', 'PHP', 'PowerShell', 'Prolog', 'Python', 'R ', 'Raku', 'Ruby', 'Rust', 'SAS', 'Scala', 'Solidity', 'SQL', 'Swift', 'TypeScript', 'VBA', 'Visual Basic (.Net)', 'Zig'], key="language")
+    Database = st.sidebar.multiselect("Which database environments have you done extensive development work in over the past year",['BigQuery', 'Cassandra', 'Clickhouse', 'Cloud Firestore', 'Cockroachdb', 'Cosmos DB', 'Couch DB', 'Couchbase', 'Datomic', 'DuckDB', 'Dynamodb', 'Elasticsearch', 'Firebase Realtime Database', 'Firebird', 'H2', 'IBM DB2', 'InfluxDB', 'MariaDB', 'Microsoft Access', 'Microsoft SQL Server', 'MongoDB', 'MySQL', 'Neo4J', 'Oracle', 'PostgreSQL', 'RavenDB', 'Redis', 'Snowflake', 'Solr', 'SQLite', 'Supabase', 'TiDB', 'BigQuery', 'Cassandra', 'Clickhouse', 'Cloud Firestore', 'Cockroachdb', 'Cosmos DB', 'Couch DB', 'Couchbase', 'Datomic', 'DuckDB', 'Dynamodb', 'Elasticsearch', 'Firebase Realtime Database', 'Firebird', 'H2', 'IBM DB2', 'InfluxDB', 'MariaDB', 'Microsoft Access', 'Microsoft SQL Server', 'MongoDB', 'MySQL', 'Neo4J', 'Oracle', 'PostgreSQL', 'RavenDB', 'Redis', 'Snowflake', 'Solr', 'SQLite', 'Supabase', 'TiDB'],key="database")
+    Platform = st.sidebar.multiselect("Which cloud platforms have you done extensive development work in over the past year?: ",['Amazon Web Services (AWS)', 'Cloudflare', 'Colocation', 'Digital Ocean', 'Firebase', 'Fly.io', 'Google Cloud', 'Heroku', 'Hetzner', 'IBM Cloud Or Watson', 'Linode', 'Managed Hosting', 'Microsoft Azure', 'Netlify', 'OpenShift', 'OpenStack', 'Oracle Cloud Infrastructure (OCI)', 'OVH', 'Render', 'Scaleway', 'Vercel', 'VMware', 'Vultr', 'Amazon Web Services (AWS)', 'Cloudflare', 'Colocation', 'Digital Ocean', 'Firebase', 'Fly.io', 'Google Cloud', 'Heroku', 'Hetzner', 'IBM Cloud Or Watson', 'Linode', 'Managed Hosting', 'Microsoft Azure', 'Netlify', 'OpenShift', 'OpenStack', 'Oracle Cloud Infrastructure (OCI)', 'OVH', 'Render', 'Scaleway', 'Vercel', 'VMware', 'Vultr'],key="platform")
+    Webframe= st.sidebar.multiselect("Which web frameworks and web technologies have you done extensive development work in over the past year?: ",['Angular', 'AngularJS', 'ASP.NET', 'ASP.NET CORE', 'Blazor', 'CodeIgniter', 'Deno', 'Django', 'Drupal', 'Elm', 'Express', 'FastAPI', 'Fastify', 'Flask', 'Gatsby', 'jQuery', 'Laravel', 'Lit', 'NestJS', 'Next.js', 'Node.js', 'Nuxt.js', 'Phoenix', 'Play Framework ', 'Qwik', 'React', 'Remix', 'Ruby on Rails', 'Solid.js', 'Spring Boot', 'Svelte', 'Angular', 'AngularJS', 'ASP.NET', 'ASP.NET CORE', 'Blazor', 'CodeIgniter', 'Deno', 'Django', 'Drupal', 'Elm', 'Express', 'FastAPI', 'Fastify', 'Flask', 'Gatsby', 'jQuery', 'Laravel', 'Lit', 'NestJS', 'Next.js', 'Node.js', 'Nuxt.js', 'Phoenix', 'Play Framework ', 'Qwik', 'React', 'Remix', 'Ruby on Rails', 'Solid.js', 'Spring Boot', 'Svelte', 'Symfony', 'Vue.js', 'WordPress'],key="Webframe")
     LearnCode_str = ', '.join(LearnCode)
     Language_str = ', '.join(Language)
     Employment_str = ', '.join(Employment)
+    Database_str =  ', '.join(Database)
+    Platform_str =  ', '.join(Platform)
+    Webframe_str=  ', '.join(Webframe)
     
-    features={'Age': Age, 'RemoteWork': RemoteWork, 'EdLevel': EdLevel,  'YearsCodePro': YearsCodePro, 'Industry': Industry, 'DevType': DevType, 'OrgSize': OrgSize, 'Country': Country, 'Employment': Employment_str ,'LanguageHaveWorkedWith': Language_str, 'LearnCode': LearnCode_str}
+    features={'Age': Age, 'RemoteWork': RemoteWork, 'EdLevel': EdLevel,  'YearsCodePro': YearsCodePro, 'Industry': Industry, 'DevType': DevType, 'OrgSize': OrgSize, 'Country': Country, 'Employment': Employment_str ,'LanguageHaveWorkedWith': Language_str, 'LearnCode': LearnCode_str,'DatabaseHaveWorkedWith':Database_str,'PlatformHaveWorkedWith':Platform_str,'WebframeHaveWorkedWith':Webframe_str}
     index = [0]
 # Creating a DataFrame
     data_predict = pd.DataFrame(features, index=index)
@@ -261,10 +269,24 @@ def pre_process(filtered_df):
     learn_code=filtered_df['LearnCode'].str.get_dummies(sep=';')
     languages = filtered_df['LanguageHaveWorkedWith'].str.get_dummies(sep=';')
     Employ_situation = filtered_df['Employment'].str.get_dummies(sep=';')
-    Merge_data=filtered_df.merge(Employ_situation,left_index=True, right_index=True).merge(languages,left_index=True, right_index=True).merge(learn_code,left_index=True, right_index=True)
-    New_data=Merge_data.drop(columns=["Employment", "LearnCode", "LanguageHaveWorkedWith"])
+    Database = filtered_df['DatabaseHaveWorkedWith'].str.get_dummies(sep=';')
+    Platform = filtered_df['PlatformHaveWorkedWith'].str.get_dummies(sep=';')
+    Webframe=filtered_df['WebframeHaveWorkedWith'].str.get_dummies(sep=';')
+    Merge_data = (
+    filtered_df
+    .merge(Employ_situation, left_index=True, right_index=True)
+    .merge(languages, left_index=True, right_index=True)
+    .merge(learn_code, left_index=True, right_index=True)
+    .merge(Database, left_index=True, right_index=True)
+    .merge(Platform, left_index=True, right_index=True)
+    .merge(Webframe, left_index=True, right_index=True)
+)
+    columns_to_drop = ["Employment", "LearnCode", "LanguageHaveWorkedWith", "DatabaseHaveWorkedWith", "PlatformHaveWorkedWith", 'WebframeHaveWorkedWith']
+    New_data = Merge_data.drop(columns=columns_to_drop)
     table = New_data.copy()
     wanted_cols = table.select_dtypes(include=['object']).columns
+
+
     for col in wanted_cols:
         if col in loaded_encoders:
             table[col] = table[col].map(loaded_encoders[col])
@@ -316,4 +338,6 @@ elif app_mode == "Salary Prediction":
     if st.button("Predict salary", key="predict"):
         st.markdown("Your yearly salary prediction is:")
         st.write(formatted_salary)
+
+
 
