@@ -1,4 +1,5 @@
 # train_model.py
+from multiprocessing import freeze_support
 import pandas as pd
 import numpy as np
 from sklearn.impute import SimpleImputer
@@ -12,9 +13,11 @@ from xgboost import XGBRegressor
 
 data = pd.read_csv("survey_results_public.csv")
 
+
 # Select features and target variable
-select = ['Age', 'Employment', 'RemoteWork', 'EdLevel', 'LearnCode', 'YearsCodePro',
-          'Industry', 'DevType', 'OrgSize', 'ConvertedCompYearly', 'Country', 'LanguageHaveWorkedWith']
+select = ['Age', 'Employment', 'RemoteWork', 'EdLevel', 'LearnCode', 'YearsCodePro','Industry', 'DevType', 'OrgSize',
+        'ConvertedCompYearly', 'Country', 'LanguageHaveWorkedWith','DatabaseHaveWorkedWith','PlatformHaveWorkedWith',
+        'WebframeHaveWorkedWith']
 data_df = data[select]
 
 # Drop rows with missing salary values
@@ -26,6 +29,8 @@ y = np.log(df_no_missing['ConvertedCompYearly']).copy()
 # Drop the target variable from the feature set
 filtered_df = df_no_missing.drop(columns=['ConvertedCompYearly'])
 
+# Preprocess the data
+
 # Function to fit and transform the data using encoders
 encoders = {}
 def fit_transform_column(column):
@@ -36,8 +41,20 @@ def pre_process(filtered_df):
     learn_code=filtered_df['LearnCode'].str.get_dummies(sep=';')
     languages = filtered_df['LanguageHaveWorkedWith'].str.get_dummies(sep=';')
     Employ_situation = filtered_df['Employment'].str.get_dummies(sep=';')
-    Merge_data=filtered_df.merge(Employ_situation,left_index=True, right_index=True).merge(languages,left_index=True, right_index=True).merge(learn_code,left_index=True, right_index=True)
-    New_data=Merge_data.drop(columns=["Employment", "LearnCode", "LanguageHaveWorkedWith"])
+    Database = filtered_df['DatabaseHaveWorkedWith'].str.get_dummies(sep=';')
+    Platform = filtered_df['PlatformHaveWorkedWith'].str.get_dummies(sep=';')
+    Webframe=filtered_df['WebframeHaveWorkedWith'].str.get_dummies(sep=';')
+    Merge_data = (
+    filtered_df
+    .merge(Employ_situation, left_index=True, right_index=True)
+    .merge(languages, left_index=True, right_index=True)
+    .merge(learn_code, left_index=True, right_index=True)
+    .merge(Database, left_index=True, right_index=True)
+    .merge(Platform, left_index=True, right_index=True)
+    .merge(Webframe, left_index=True, right_index=True)
+)
+    columns_to_drop = ["Employment", "LearnCode", "LanguageHaveWorkedWith", "DatabaseHaveWorkedWith", "PlatformHaveWorkedWith", 'WebframeHaveWorkedWith']
+    New_data = Merge_data.drop(columns=columns_to_drop)
     table = New_data.copy()
     wanted_cols = table.select_dtypes(include=['object']).columns
 
